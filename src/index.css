@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans antialiased text-gray-900 bg-gray-50;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply w-full bg-brand-purple text-white font-semibold py-3.5 px-6
+           rounded-full transition-all duration-200
+           hover:opacity-90 active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply w-full bg-brand-yellow text-gray-900 font-semibold py-3.5 px-6
+           rounded-full transition-all duration-200
+           hover:opacity-90 active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply w-full border-2 border-brand-purple text-brand-purple font-semibold
+           py-3 px-6 rounded-full transition-all duration-200
+           hover:bg-brand-light active:scale-[0.98];
+  }
+  .btn-soft {
+    @apply w-full bg-brand-light text-brand-purple font-semibold py-3 px-6
+           rounded-full transition-all duration-200
+           hover:bg-brand-mid active:scale-[0.98];
+  }
+  .card {
+    @apply bg-white rounded-2xl p-5 shadow-sm border border-gray-100
+           transition-shadow duration-200;
+  }
+  .card-interactive {
+    @apply card hover:shadow-md cursor-pointer;
+  }
+  .tag {
+    @apply px-4 py-2.5 rounded-full text-sm font-medium
+           border-2 transition-all duration-150 cursor-pointer
+           select-none active:scale-95;
+  }
+  .tag-selected {
+    @apply tag bg-brand-purple text-white border-brand-purple;
+  }
+  .tag-unselected {
+    @apply tag bg-white text-gray-700 border-gray-200
+           hover:border-brand-purple hover:text-brand-purple;
+  }
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D0C8E8;
+  border-radius: 4px;
+}
