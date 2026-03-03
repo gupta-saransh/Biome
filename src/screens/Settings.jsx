@@ -11,6 +11,11 @@ export default function Settings() {
   const updateCycleLength = useStore((s) => s.updateCycleLength)
   const checkInHistory = useStore((s) => s.checkInHistory)
   const adaptActions = useStore((s) => s.adaptActions)
+  const periodActive = useStore((s) => s.periodActive)
+  const periodStartDate = useStore((s) => s.periodStartDate)
+  const periodHistory = useStore((s) => s.periodHistory)
+  const logPeriodStart = useStore((s) => s.logPeriodStart)
+  const logPeriodEnd = useStore((s) => s.logPeriodEnd)
   const resetApp = useStore((s) => s.resetApp)
 
   const [showConfirmReset, setShowConfirmReset] = useState(false)
@@ -103,12 +108,76 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Period Tracking */}
+      <div className="card">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+          Period Tracking
+        </h3>
+
+        <div className="space-y-3">
+          {/* Current status */}
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-rose-50 border border-rose-100">
+            <div className="flex items-center gap-2.5">
+              <span className="text-lg">🩸</span>
+              <div>
+                <p className="text-sm font-semibold text-gray-800">
+                  {periodActive ? 'Period in progress' : 'No active period'}
+                </p>
+                {periodActive && periodStartDate && (
+                  <p className="text-xs text-rose-600 mt-0.5">Started {periodStartDate}</p>
+                )}
+              </div>
+            </div>
+            {periodActive ? (
+              <button
+                onClick={logPeriodEnd}
+                className="text-xs font-bold px-3 py-1.5 rounded-full
+                  bg-white text-rose-600 border border-rose-200
+                  hover:bg-rose-100 transition-colors"
+              >
+                End period
+              </button>
+            ) : (
+              <button
+                onClick={logPeriodStart}
+                className="text-xs font-bold px-3 py-1.5 rounded-full
+                  bg-rose-500 text-white hover:bg-rose-600 transition-colors"
+              >
+                Mark started
+              </button>
+            )}
+          </div>
+
+          {/* Period history */}
+          {periodHistory.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">History</p>
+              <div className="space-y-1.5">
+                {periodHistory.slice().reverse().slice(0, 4).map((p) => (
+                  <div key={p.id}
+                    className="flex items-center justify-between text-xs py-2 px-3
+                      rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-rose-400 shrink-0" />
+                      <span className="text-gray-600 font-medium">{p.start}</span>
+                    </div>
+                    <span className="text-gray-400">
+                      {p.end ? `→ ${p.end}` : '→ ongoing'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="card">
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
           Your Data
         </h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div className="bg-brand-light rounded-xl p-4 text-center">
             <p className="text-2xl font-bold text-brand-purple">{checkInHistory.length}</p>
             <p className="text-xs text-gray-500 mt-1">Check-ins</p>
@@ -116,6 +185,10 @@ export default function Settings() {
           <div className="bg-green-50 rounded-xl p-4 text-center">
             <p className="text-2xl font-bold text-green-700">{adaptActions.length}</p>
             <p className="text-xs text-gray-500 mt-1">Actions logged</p>
+          </div>
+          <div className="bg-rose-50 rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-rose-600">{periodHistory.length}</p>
+            <p className="text-xs text-gray-500 mt-1">Cycles tracked</p>
           </div>
         </div>
       </div>

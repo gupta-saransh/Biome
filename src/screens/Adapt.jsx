@@ -10,20 +10,25 @@ export default function Adapt() {
   const logAdaptAction = useStore((s) => s.logAdaptAction)
   const saveCheckIn = useStore((s) => s.saveCheckIn)
   const clearFlow = useStore((s) => s.clearFlow)
+  const addPlannerBlock = useStore((s) => s.addPlannerBlock)
 
   const isLow = mode === 'low'
   const adaptations = isLow ? ADAPTATIONS_LOW : ADAPTATIONS_HIGH
   const [loggedActions, setLoggedActions] = useState([])
   const [showToast, setShowToast] = useState(null)
 
+  const todayKey = new Date().toISOString().split('T')[0]
+
   const handleAction = (adaptation) => {
     logAdaptAction(adaptation.action)
     setLoggedActions((prev) => [...prev, adaptation.action])
     setShowToast(adaptation.actionLabel)
-    setTimeout(() => setShowToast(null), 2000)
+    setTimeout(() => setShowToast(null), 2500)
 
-    // If it's "Open planner" action, navigate there
     if (adaptation.action === 'plan-week') {
+      handleFinish('/planner')
+    } else if (adaptation.action === 'deep-work') {
+      addPlannerBlock(todayKey, 'Focus time')
       handleFinish('/planner')
     }
   }
@@ -40,6 +45,7 @@ export default function Adapt() {
         step={4}
         total={4}
         onBack={() => navigate(`/flow/${mode}/validate`)}
+        onForward={() => handleFinish('/')}
         mode={mode}
       />
 

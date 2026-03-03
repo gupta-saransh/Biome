@@ -26,6 +26,7 @@ export default function Validate() {
         step={3}
         total={4}
         onBack={() => navigate(`/flow/${mode}/label`)}
+        onForward={() => navigate(`/flow/${mode}/adapt`)}
         mode={mode}
       />
 

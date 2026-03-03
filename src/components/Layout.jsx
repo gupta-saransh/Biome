@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import useStore from '../store/useStore'
 import { getCyclePhase } from '../utils/helpers'
@@ -49,9 +49,27 @@ export default function Layout() {
   const cycleDay = useStore((s) => s.cycleDay)
   const cycleLength = useStore((s) => s.cycleLength)
   const startFlow = useStore((s) => s.startFlow)
+  const notifications = useStore((s) => s.notifications)
+  const markNotificationRead = useStore((s) => s.markNotificationRead)
+  const markAllNotificationsRead = useStore((s) => s.markAllNotificationsRead)
   const navigate = useNavigate()
   const [chatOpen, setChatOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const notifRef = useRef(null)
+
+  const unreadCount = notifications.filter((n) => !n.read).length
+
+  // Close notification panel when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const phase = getCyclePhase(cycleDay, cycleLength)
 
@@ -153,14 +171,14 @@ export default function Layout() {
               className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full
                 bg-brand-purple text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
             >
-              😔 <span>Hard day</span>
+              😔 <span>Feeling low</span>
             </button>
             <button
               onClick={() => handleFlow('high')}
               className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full
                 bg-brand-yellow text-gray-900 text-[13px] font-semibold hover:opacity-85 transition-opacity"
             >
-              ✨ <span>Good day</span>
+              ✨ <span>Feeling good</span>
             </button>
 
             {/* Chat toggle */}
@@ -178,6 +196,78 @@ export default function Layout() {
               </svg>
               <span className="hidden sm:inline">{chatOpen ? 'Close chat' : 'Ask Biome'}</span>
             </button>
+
+            {/* Notification Bell */}
+            <div ref={notifRef} className="relative">
+              <button
+                onClick={() => setNotifOpen(v => !v)}
+                className={`relative flex items-center justify-center w-9 h-9 rounded-full border-2
+                  transition-all duration-200
+                  ${notifOpen
+                    ? 'bg-brand-purple text-white border-brand-purple'
+                    : 'bg-white text-gray-500 border-gray-200 hover:border-brand-purple hover:text-brand-purple'
+                  }`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 01-3.46 0"/>
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
+                    bg-rose-500 text-white text-[10px] font-bold rounded-full
+                    flex items-center justify-center leading-none">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification dropdown */}
+              {notifOpen && (
+                <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-bold text-gray-900">Notifications</p>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllNotificationsRead}
+                        className="text-xs text-brand-purple font-semibold hover:underline"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  <div className="divide-y divide-gray-50 max-h-72 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="py-8 text-center">
+                        <span className="text-2xl">🔔</span>
+                        <p className="text-sm text-gray-400 mt-2">No notifications</p>
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <button
+                          key={n.id}
+                          onClick={() => markNotificationRead(n.id)}
+                          className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors
+                            ${!n.read ? 'bg-violet-50/60' : ''}`}
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0
+                              ${n.read ? 'bg-gray-200' : 'bg-brand-purple'}`} />
+                            <p className={`text-xs leading-relaxed
+                              ${n.read ? 'text-gray-400' : 'text-gray-800 font-medium'}`}>
+                              {n.message}
+                            </p>
+                          </div>
+                          <p className="text-[10px] text-gray-300 mt-1 pl-4.5">
+                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

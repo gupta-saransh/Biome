@@ -38,6 +38,8 @@ export default function CheckIn() {
         step={1}
         total={4}
         onBack={() => navigate('/')}
+        onForward={handleSubmit}
+        forwardDisabled={!canSubmit}
         mode={mode}
       />
 
@@ -136,7 +138,7 @@ export default function CheckIn() {
 
 // ── Flow Header (shared across flow screens) ──
 
-export function FlowHeader({ step, total, onBack, mode }) {
+export function FlowHeader({ step, total, onBack, onForward, forwardDisabled = false, mode }) {
   const progress = (step / total) * 100
   return (
     <div className="sticky top-0 z-20 bg-white border-b border-gray-100">
@@ -151,6 +153,7 @@ export function FlowHeader({ step, total, onBack, mode }) {
         />
       </div>
       <div className="max-w-lg mx-auto flex items-center justify-between px-4 py-3">
+        {/* Back */}
         <button
           onClick={onBack}
           className="p-1.5 -ml-1.5 text-gray-500 hover:text-gray-900 transition-colors"
@@ -160,6 +163,8 @@ export function FlowHeader({ step, total, onBack, mode }) {
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </button>
+
+        {/* Step dots */}
         <div className="flex gap-1.5">
           {Array.from({ length: total }, (_, i) => (
             <div
@@ -174,7 +179,25 @@ export function FlowHeader({ step, total, onBack, mode }) {
             />
           ))}
         </div>
-        <div className="w-8" />
+
+        {/* Forward */}
+        {onForward ? (
+          <button
+            onClick={onForward}
+            disabled={forwardDisabled}
+            className={`p-1.5 -mr-1.5 transition-colors
+              ${forwardDisabled
+                ? 'text-gray-200 cursor-not-allowed'
+                : 'text-gray-500 hover:text-gray-900'}`}
+            aria-label="Go forward"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        ) : (
+          <div className="w-8" />
+        )}
       </div>
     </div>
   )

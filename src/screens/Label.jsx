@@ -23,6 +23,7 @@ export default function Label() {
         step={2}
         total={4}
         onBack={() => navigate(`/flow/${mode}/check-in`)}
+        onForward={() => navigate(`/flow/${mode}/validate`)}
         mode={mode}
       />
 

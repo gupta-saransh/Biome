@@ -189,7 +189,7 @@ export const WEEKLY_PLAN = [
 // ── Default User (for demo pre-population) ──
 
 export const DEFAULT_USER = {
-  name: 'Anisha',
+  name: 'Anisha Jain',
   preferences: {
     movement: ['Yoga / pilates', 'Gym / weights'],
     triggers: ['Bad sleep', 'Hormones / cycle'],
